@@ -1,0 +1,24 @@
+name: profile-check
+
+on:
+  push:
+  schedule:
+    - cron: "41 10 * * 1"   # weekly, after the repos' own weekly CI runs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: every linked repo exists and its latest CI run is green
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/profile_check.py
